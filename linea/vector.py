@@ -1,5 +1,8 @@
 import math
 import numpy
+import pdb
+
+EQUALITY_TOLERANCE = 0.001
 
 
 class NonConformantVectors(Exception):
@@ -41,6 +44,9 @@ class Vector:
         o = list(map(lambda x: x * other, self.v))
         return Vector(a=o)
 
+    def __rmul__(self, other):
+        return self * other
+
     def __add__(self, other):
         if len(self) != len(other):
             raise NonConformantVectors(len(self), len(other))
@@ -52,7 +58,11 @@ class Vector:
         return Vector(self.v - other.v)
 
     def __eq__(self, other):
-        return (self.v == other.v).all()
+        if not isinstance(other, Vector):
+            raise ValueError
+        if len(self) != len(other):
+            raise NonConformantVectors(len(self), len(other))
+        return numpy.isclose(self.v, other.v, EQUALITY_TOLERANCE).all()
 
     def __repr__(self):
         return 'Vector[{}]'.format(len(self))
@@ -61,38 +71,17 @@ class Vector:
         return math.sqrt(sum(map(lambda x: x * x, self.v)))
 
     def unit(self):
-        return self * (1 / self.magnitude())
+        mag = self.magnitude()
+        if mag == 0:
+            raise ValueError("cannot normalise the zero vector")
+        return self * (1 / mag)
 
 
 def unit1_test():
-    # Test Vector string representations.
-    v1 = Vector(1, 2, 3)
-    print("Vector: {}".format(str(v1)))
-
-    # Test Vector representation.
-    v2 = Vector(1, 2, 3)
-    print("Vector object is {}".format(repr(v2)))
-
-    # Test equality checks.
-    v3 = Vector(1, 3, 5)
-    print("{} == {}: {}".format(v1, v2, v1 == v2))
-    print("{} == {}: {}".format(v1, v3, v1 == v3))
-
-    v1 = Vector(8.218, -9.341)
-    v2 = Vector(-1.129, 2.111)
-    print("{} + {} = {}".format(v1, v2, v1 + v2))
-
-    v1 = Vector(7.119, 8.215)
-    v2 = Vector(-8.223, 0.878)
-    print("{} - {} = {}".format(v1, v2, v1 - v2))
-
-    v1 = Vector(1.671, -1.012, -0.318)
-    k = 7.41
-    print("{} * {} = {}".format(v1, k, v1 * k))
-
     v1 = Vector(1, 2, 3)
     print('Magnitude of {}: {}'.format(v1, v1.magnitude()))
     print('Unit vector for {} is {}'.format(v1, v1.unit()))
+
 
 if __name__ == '__main__':
     unit1_test()
