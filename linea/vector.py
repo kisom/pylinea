@@ -76,12 +76,23 @@ class Vector:
             raise ValueError("cannot normalise the zero vector")
         return self * (1 / mag)
 
+# The dot (or inner) product determines the angle between two vectors.
+def dot(v, w):
+    assert(isinstance(v, Vector))
+    assert(isinstance(v, Vector))
+    inner = sum([a * b for (a, b) in zip(v.v, w.v)])
 
-def unit1_test():
-    v1 = Vector(1, 2, 3)
-    print('Magnitude of {}: {}'.format(v1, v1.magnitude()))
-    print('Unit vector for {} is {}'.format(v1, v1.unit()))
+    # Cauchy-Schwartz inequality
+    assert(abs(inner) <= (v.magnitude() * w.magnitude()))
+    return inner
 
+def angle(v, w):
+    assert(isinstance(v, Vector))
+    assert(isinstance(v, Vector))
 
-if __name__ == '__main__':
-    unit1_test()
+    inner = dot(v.unit(), w.unit())
+    theta = math.acos(inner)
+    return theta
+
+def r2d(rval):
+    return rval * 180 / math.pi
