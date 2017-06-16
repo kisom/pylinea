@@ -155,14 +155,29 @@ class Vector:
         return parallel(self, other)
 
     def orthogonal_to(self, other):
-        """"Return True if the vector other is orthogonal to this vector. """
+        """"Return True if the vector other is orthogonal to this vector."""
         return orthogonal(self, other)
 
+    def project(self, basis):
+        """
+        Return the projection of this vector onto the given basis vector.
+        """
+        unit_basis = basis.unit()
+        return dot(self, unit_basis) * unit_basis
+
+    def orthogonal(self, basis):
+        """
+        Compute the orthogonal projection of the vector from the given basis
+        vector.
+        """
+        spar = self.project(basis)
+        return self - spar
 
 # The dot (or inner) product determines the angle between two vectors.
 def dot(v, w):
     """
     Return the dot product of vectors v and w.
+    :rtype: Vector
     """
     assert isinstance(v, Vector)
     assert isinstance(v, Vector)

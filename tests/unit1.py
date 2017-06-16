@@ -92,6 +92,7 @@ def test_dot_product():
     with pytest.raises(ValueError):
         v1.angle_with(v9)
 
+
 # Video 10.
 def test_parallel_orthogonal():
     v1 = vec.Vector(-7.579, -7.88)
@@ -113,3 +114,12 @@ def test_parallel_orthogonal():
     v8 = vec.Vector(0, 0)
     assert v7.parallel_to(v8)
     assert v7.orthogonal_to(v8)
+
+
+# Video 12
+def test_projection():
+    v1 = vec.Vector(1, 3)
+    v2 = vec.Vector(3, 3)
+    v3 = v1.project(v2)
+    v4 = v1.orthogonal(v2)
+    assert v3 + v4 == v1
