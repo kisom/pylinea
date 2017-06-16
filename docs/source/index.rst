@@ -11,6 +11,10 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   linea
+   util
+   vector
+
 
 
 Indices and tables

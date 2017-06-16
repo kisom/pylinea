@@ -1,6 +1,17 @@
+# -*- coding: utf-8 -*-
 """
-pylinea.vector implements arbitrarily-sized single-dimension vectors
-built on numpy's ndarray.
+``linea.vector``
+
+Arbitrarily-sized vectors built on numpy's ndarray.
+
+Components:
+
++ class Vector
++ exception NonConformantVectors
++ function: dot
++ function: angle
++ function: parallel
++ function: orthogonal
 """
 # pylint: disable=C0103
 import math
@@ -18,6 +29,11 @@ class NonConformantVectors(Exception):
     """
 
     def __init__(self, expected, actual):
+        """
+        Initialize a new NonConformantVectors exception.
+        :param expected: length of the first vector
+        :param actual: length of the second vector
+        """
         self.expected = expected
         self.actual = actual
         Exception.__init__(self)
@@ -202,7 +218,9 @@ def parallel(v, w, tolerance=util.EQUALITY_TOLERANCE):
 
 
 def orthogonal(v, w, tolerance=util.EQUALITY_TOLERANCE):
-    """Return True if vectors v and w are orthogonal."""
+    """
+    Return True if vectors v and w are orthogonal.
+    """
     if len(v) != len(w):
         raise NonConformantVectors(len(v), len(w))
     if v.is_zero() or w.is_zero():
