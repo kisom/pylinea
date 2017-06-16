@@ -19,6 +19,7 @@ import numpy
 
 from . import util
 
+
 class NonConformantVectors(Exception):
     """
     A NonConformantVector is thrown when attempting to do operations
@@ -94,6 +95,9 @@ class Vector:
         if len(self) != len(other):
             raise NonConformantVectors(len(self), len(other))
         return Vector(self.v + other.v)
+
+    def __radd__(self, other):
+        return self + other
 
     def __sub__(self, other):
         if len(self) != len(other):
@@ -171,6 +175,7 @@ class Vector:
         """
         spar = self.project_parallel(basis)
         return self - spar
+
 
 # The dot (or inner) product determines the angle between two vectors.
 def dot(v, w):

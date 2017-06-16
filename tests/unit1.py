@@ -20,7 +20,7 @@ def test_equality():
 
     assert (v1 == v3)
     with pytest.raises(vec.NonConformantVectors):
-        v1 == v2
+        assert v1 != v2
     assert (v1 != v4)
 
 
