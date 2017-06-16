@@ -118,8 +118,28 @@ def test_parallel_orthogonal():
 
 # Video 12
 def test_projection():
+    # sanity check
     v1 = vec.Vector(1, 3)
     v2 = vec.Vector(3, 3)
     v3 = v1.project(v2)
     v4 = v1.orthogonal(v2)
     assert v3 + v4 == v1
+
+    v1 = vec.Vector(3.039, 1.879)
+    v2 = vec.Vector(0.825, 2.036)
+    v3 = vec.Vector(1.0826, 2.6717)
+    assert v1.project(v2) == v3
+
+    v4 = vec.Vector(-9.88, -3.264, -8.159)
+    v5 = vec.Vector(-2.155, -9.353, -9.473)
+    v6 = vec.Vector(-8.350, 3.376, -1.434)
+    assert v4.orthogonal(v5) == v6
+
+    v7 = vec.Vector(3.009, -6.172, 3.692, -2.510)
+    v8 = vec.Vector(6.404, -9.144, 2.759, 8.718)
+    v9 = vec.Vector(1.969, -2.811, 0.848, 2.680)
+    assert v7.project_parallel(v8) == v9
+    v10 = vec.Vector(1.040, -3.361, 2.844, -5.190)
+    assert v7.project_orthogonal(v8) == v10
+
+    assert (v9 + v10) == v7

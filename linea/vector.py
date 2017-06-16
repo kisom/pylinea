@@ -17,8 +17,7 @@ Components:
 import math
 import numpy
 
-from . import util
-
+import util
 
 class NonConformantVectors(Exception):
     """
@@ -158,14 +157,14 @@ class Vector:
         """"Return True if the vector other is orthogonal to this vector."""
         return orthogonal(self, other)
 
-    def project(self, basis):
+    def project_parallel(self, basis):
         """
         Return the projection of this vector onto the given basis vector.
         """
         unit_basis = basis.unit()
         return dot(self, unit_basis) * unit_basis
 
-    def orthogonal(self, basis):
+    def project_orthogonal(self, basis):
         """
         Compute the orthogonal projection of the vector from the given basis
         vector.
