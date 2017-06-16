@@ -17,7 +17,7 @@ Components:
 import math
 import numpy
 
-import util
+from . import util
 
 class NonConformantVectors(Exception):
     """
@@ -169,7 +169,7 @@ class Vector:
         Compute the orthogonal projection of the vector from the given basis
         vector.
         """
-        spar = self.project(basis)
+        spar = self.project_parallel(basis)
         return self - spar
 
 # The dot (or inner) product determines the angle between two vectors.

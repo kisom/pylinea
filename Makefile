@@ -1,4 +1,5 @@
 PY ?= 3
+SRVMOD ?= http.server
 
 # NB: the build and clean targets are less useful for this project,
 # and more meant as a skeleton for later.
@@ -24,5 +25,10 @@ setup:
 
 test:
 	py.test tests
+
+.PHONY: viewdocs
+viewdocs: docs
+	cd docs/build/html && python$(PY) -m $(SRVMOD)
+
 
 .PHONY: build check clean docs lint setup test
