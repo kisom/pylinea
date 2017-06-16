@@ -1,3 +1,7 @@
+"""
+pylinea.vector implements arbitrarily-sized single-dimension vectors
+built on numpy's ndarray.
+"""
 import math
 import numpy
 
@@ -5,6 +9,12 @@ EQUALITY_TOLERANCE = 0.001
 
 
 class NonConformantVectors(Exception):
+    """
+    A NonConformantVector is thrown when attempting to do operations
+    with vectors of differing sizes; generally, the size of the
+    /right-hand/ argument doesn't conform to the size of the /left-hand/
+    argument.
+    """
     def __init__(self, expected, actual):
         self.expected = expected
         self.actual = actual
@@ -17,7 +27,19 @@ class NonConformantVectors(Exception):
 
 
 class Vector:
+    """
+    A vector is a one-dimensional vector of some arbitrary size. This size
+    is fixed and can't be changed later in the Vector's life.
+    """
     def __init__(self, a=None, *args):
+        """
+        Initialise a vector, either using an iterable passed in or as a sequence
+        of values.
+        >>> print(Vector(1, 2, 3))
+        [1; 2; 3]
+        >>> print(Vector([1, 2, 3]))
+        [1; 2; 3]
+        """
         if len(args) > 0:
             a = [a]
             a.extend(args)
@@ -71,18 +93,31 @@ class Vector:
         return 'Vector[{}]'.format(len(self))
 
     def magnitude(self):
+        """
+        Return the magnitude of the vector.
+        """
         return math.sqrt(sum(map(lambda x: x * x, self.v)))
 
-    def is_zero(self):
-        return numpy.isclose(self.magnitude(), 0, EQUALITY_TOLERANCE)
+    def is_zero(self, tolerance=EQUALITY_TOLERANCE):
+        """
+        Return True if the vector is a zero vector (within some tolerance).
+        """
+        return numpy.isclose(self.magnitude(), 0, tolerance)
 
     def unit(self):
+        """
+        Return the unit vector of this vector. If this method is called on
+        a zero vector (i.e. is_zero returns True), a ValueError will be thrown.
+        """
         mag = self.magnitude()
         if self.is_zero():
             raise ValueError("cannot normalise the zero vector")
         return self * (1 / mag)
 
     def dot(self, other):
+        """
+        Compute the dot product between this vector and the other vector.
+        """
         return dot(self, other)
 
     def angle_with(self, other, in_degrees=False):
