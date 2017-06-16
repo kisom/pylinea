@@ -2,10 +2,11 @@
 pylinea.vector implements arbitrarily-sized single-dimension vectors
 built on numpy's ndarray.
 """
+# pylint: disable=C0103
 import math
 import numpy
 
-EQUALITY_TOLERANCE = 0.001
+from . import util
 
 
 class NonConformantVectors(Exception):
@@ -15,6 +16,7 @@ class NonConformantVectors(Exception):
     /right-hand/ argument doesn't conform to the size of the /left-hand/
     argument.
     """
+
     def __init__(self, expected, actual):
         self.expected = expected
         self.actual = actual
@@ -31,6 +33,7 @@ class Vector:
     A vector is a one-dimensional vector of some arbitrary size. This size
     is fixed and can't be changed later in the Vector's life.
     """
+
     def __init__(self, a=None, *args):
         """
         Initialise a vector, either using an iterable passed in or as a sequence
@@ -87,7 +90,10 @@ class Vector:
             raise ValueError
         if len(self) != len(other):
             raise NonConformantVectors(len(self), len(other))
-        return numpy.isclose(self.v, other.v, EQUALITY_TOLERANCE).all()
+        eq = numpy.isclose(self.v, other.v, util.EQUALITY_TOLERANCE)
+        if isinstance(eq, bool):
+            return eq
+        return eq.all()
 
     def __repr__(self):
         return 'Vector[{}]'.format(len(self))
@@ -98,7 +104,7 @@ class Vector:
         """
         return math.sqrt(sum(map(lambda x: x * x, self.v)))
 
-    def is_zero(self, tolerance=EQUALITY_TOLERANCE):
+    def is_zero(self, tolerance=util.EQUALITY_TOLERANCE):
         """
         Return True if the vector is a zero vector (within some tolerance).
         """
@@ -121,17 +127,27 @@ class Vector:
         return dot(self, other)
 
     def angle_with(self, other, in_degrees=False):
+        """
+        Compute the angle between this vector and the other vector. The
+        default is to return the angle in radians. If in_degrees is True,
+        returns the angle in degrees.
+        """
         return angle(self, other, in_degrees=in_degrees)
 
     def parallel_to(self, other):
+        """Return True if the vector other is parallel to this vector."""
         return parallel(self, other)
 
     def orthogonal_to(self, other):
+        """"Return True if the vector other is orthogonal to this vector. """
         return orthogonal(self, other)
 
 
 # The dot (or inner) product determines the angle between two vectors.
 def dot(v, w):
+    """
+    Return the dot product of vectors v and w.
+    """
     assert isinstance(v, Vector)
     assert isinstance(v, Vector)
     inner = sum([a * b for (a, b) in zip(v.v, w.v)])
@@ -141,7 +157,11 @@ def dot(v, w):
     return inner
 
 
-def angle(v, w, in_degrees=False):
+def angle(v, w, in_degrees=False, tolerance=util.EQUALITY_TOLERANCE):
+    """
+    Return the angle between vectors v and w in radians. If in_degrees is
+    True, return the answer in degrees.
+    """
     assert isinstance(v, Vector)
     assert isinstance(v, Vector)
 
@@ -149,11 +169,9 @@ def angle(v, w, in_degrees=False):
         # check for floating point problems resulting in domain errors
         inner = dot(v.unit(), w.unit())
         if inner > 1:
-            if numpy.isclose(inner, 1, 0.00000001):
-                inner = 1
+            inner = util.clamp_if_close(inner, 1.0, tolerance)
         if inner < -1:
-            if numpy.isclose(inner, -1, 0.00000001):
-                inner = -1
+            inner = util.clamp_if_close(inner, -1.0, tolerance)
     except NonConformantVectors:
         raise ValueError('Cannot determine the angle between the zero vector and another vector.')
     except:
@@ -161,11 +179,12 @@ def angle(v, w, in_degrees=False):
         raise
     theta = math.acos(inner)
     if in_degrees:
-        theta = r2d(theta)
+        theta = util.r2d(theta)
     return theta
 
 
-def parallel(v, w):
+def parallel(v, w, tolerance=util.EQUALITY_TOLERANCE):
+    """Return True if vectors v and w are parallel."""
     if len(v) != len(w):
         raise NonConformantVectors(len(v), len(w))
     if v.is_zero() or w.is_zero():
@@ -177,19 +196,15 @@ def parallel(v, w):
     # right, but... the video showed a better way. Lesson learned, think about things instead
     # of blindly coding through.
     theta = angle(v, w)
-    if numpy.isclose(theta, 0, EQUALITY_TOLERANCE):
+    if numpy.isclose(theta, 0, tolerance):
         return True
-    return numpy.isclose(theta, math.pi, EQUALITY_TOLERANCE)
+    return numpy.isclose(theta, math.pi, tolerance)
 
 
-def orthogonal(v, w):
+def orthogonal(v, w, tolerance=util.EQUALITY_TOLERANCE):
+    """Return True if vectors v and w are orthogonal."""
     if len(v) != len(w):
         raise NonConformantVectors(len(v), len(w))
     if v.is_zero() or w.is_zero():
         return True
-    return numpy.isclose(dot(v, w), 0, EQUALITY_TOLERANCE)
-
-
-def r2d(rval):
-    assert abs(rval) <= (2 * math.pi)
-    return rval * 180 / math.pi
+    return numpy.isclose(dot(v, w), 0, tolerance)

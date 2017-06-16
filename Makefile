@@ -16,10 +16,13 @@ clean:
 docs:
 	cd docs && make html
 
+lint:
+	pylint linea/*.py
+
 setup:
 	pip$(PY) install -r requirements.txt
 
 test:
 	py.test tests
 
-.PHONY: build check clean docs setup test
+.PHONY: build check clean docs lint setup test

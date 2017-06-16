@@ -1,11 +1,12 @@
 import linea.vector as vec
+import linea.util as util
 import numpy
 import pytest
 from .context import vec
 
 
 def fequal(a, b):
-    eq = numpy.isclose(a, b, vec.EQUALITY_TOLERANCE)
+    eq = numpy.isclose(a, b, util.EQUALITY_TOLERANCE)
     if isinstance(eq, numpy.ndarray):
         return eq.all()
     return eq
