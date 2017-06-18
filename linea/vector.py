@@ -19,7 +19,6 @@ import numpy
 
 from . import util
 
-
 class NonConformantVectors(Exception):
     """
     A NonConformantVector is thrown when attempting to do operations
@@ -117,6 +116,9 @@ class Vector:
     def __repr__(self):
         return 'Vector[{}]'.format(len(self))
 
+    def __getitem__(self, item):
+        return self.v[item]
+
     def magnitude(self):
         """
         Return the magnitude of the vector.
@@ -166,7 +168,7 @@ class Vector:
         Return the projection of this vector onto the given basis vector.
         """
         unit_basis = basis.unit()
-        return dot(self, unit_basis) * unit_basis
+        return Vector(dot(self, unit_basis) * unit_basis)
 
     def project_orthogonal(self, basis):
         """
@@ -197,9 +199,6 @@ def angle(v, w, in_degrees=False, tolerance=util.EQUALITY_TOLERANCE):
     Return the angle between vectors v and w in radians. If in_degrees is
     True, return the answer in degrees.
     """
-    assert isinstance(v, Vector)
-    assert isinstance(v, Vector)
-
     try:
         # check for floating point problems resulting in domain errors
         inner = dot(v.unit(), w.unit())
@@ -245,3 +244,29 @@ def orthogonal(v, w, tolerance=util.EQUALITY_TOLERANCE):
     if v.is_zero() or w.is_zero():
         return True
     return numpy.isclose(dot(v, w), 0, tolerance)
+
+
+def cross(v, w):
+    """Return the cross product of the 3D vectors v and w."""
+    if len(v) != 3:
+        raise NonConformantVectors(3, len(v))
+    if len(w) != 3:
+        raise NonConformantVectors(3, len(w))
+
+    (x1, y1, z1) = v.v
+    (x2, y2, z2) = w.v
+    xc = (y1 * z2) - (y2 * z1)
+    # - (x1 * z2) - (x2 * z1)
+    yc = (x1 * z2) - (x2 * z1)
+    # x1 * y2 - x2 * y1
+    zc = (x1 * y2) - (x2 * y1)
+    return Vector(xc, -yc, zc)
+
+def area_parallelogram(v, w):
+    """Return the area of a parallelogram formed by Vectors v and w."""
+    u = cross(v, w)
+    return u.magnitude()
+
+def area_triangle(v, w):
+    """Return the area of a triangle formed by Vectors v and w."""
+    return 0.5 * area_parallelogram(v, w)

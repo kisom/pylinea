@@ -143,3 +143,25 @@ def test_projection():
     assert v7.project_orthogonal(v8) == v10
 
     assert (v9 + v10) == v7
+
+def test_cross_product():
+    # sanity check
+    v1 = vec.Vector(5, 3, -2)
+    v2 = vec.Vector(-1, 0, 3)
+    v3 = vec.Vector(9, -13, 3)
+    assert vec.cross(v1, v2) == v3
+
+    v1 = vec.Vector(8.462, 7.893, -8.187)
+    v2 = vec.Vector(6.984, -5.975, 4.778)
+    v3 = vec.Vector(-11.205, -97.609, -105.685)
+    assert vec.cross(v1, v2) == v3
+
+    v4 = vec.Vector(-8.987, -9.838, 5.031)
+    v5 = vec.Vector(-4.268, -1.861, -8.866)
+    area = 142.122
+    assert fequal(vec.area_parallelogram(v4, v5), area)
+
+    v6 = vec.Vector(1.500, 9.547, 3.691)
+    v7 = vec.Vector(-6.007, 0.124, 5.772)
+    area = 42.565
+    assert fequal(vec.area_triangle(v6, v7), area)
